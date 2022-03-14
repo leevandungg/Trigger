@@ -138,7 +138,7 @@ INSERT INTO PRODUCT VALUES ('SP005',N'Điện thoại',N'Điện thoại thông 
 
 DELETE FROM PRODUCT WHERE MaSP = 'SP005'
 
--- Trigger Cảm
+--- Trigger: Tạo trigger khi tiến hành cập nhật  SoluongSP của bảng PRODUCT thì số lượng sản phẩm >= số lượng đặt hàng của bảng
 CREATE TRIGGER Tr_update
     ON dbo.PRODUCT
 FOR UPDATE 
@@ -185,4 +185,24 @@ ENDS CURRENT_TIMESTAMP + INTERVAL 1 MONTH
       
     select * from product;
 
- 
+-- Trigger : Khi thêm một chi tiết đơn hàng thì số lượng lớn hơn 0 và mã đơn hàng có trong đơn hàng
+CREATE TRIGGER THEM1
+ON CHITIETHOADON
+FOR INSERT
+AS
+begin
+DECLARE @SOTIEN INT,@SOLUONG INT, @KIEMTRA NVARCHAR,@GIA INT
+SELECT @GIA = GiaSPmua FROM inserted
+SELECT @SOLUONG = SoLuong FROM inserted
+SELECT @KIEMTRA = MaDH FROM INSERTED
+IF (@SOLUONG <0 ) AND (@KIEMTRA NOT IN ( SELECT MaDH FROM DONHANG) )
+ROLLBACK TRAN
+END
+GO
+
+[3:50 PM] Vo Duc Dung
+    
+-- Kiểm thử
+INSERT INTO CHITIETHOADON VALUES ('CT008',3,60000,0,'DH006','SP001')
+INSERT INTO CHITIETHOADON VALUES ('CT009',2,500000,0,'DH006','SP002')
+
