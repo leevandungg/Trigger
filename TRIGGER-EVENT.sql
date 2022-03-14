@@ -1,5 +1,6 @@
 ﻿
 
+-- Bài của Lê Văn Dũng
 -- Trigger : Khi thêm hoặc cập nhập một chi tiết hóa đơn nào đó thì sẽ cập nhập lại số lượng và tính tổng số tiền đơn hàng 
 
 ALTER TRIGGER trg_Add_Order_Detail ON CHITIETHOADON FOR INSERT, UPDATE AS
@@ -57,6 +58,7 @@ DELETE FROM CHITIETHOADON WHERE MaCTHD = 'CT006'
 
 GO
 
+-- Bài của Gia Bảo
 --Trigger: Tạo Trigger khi ta order 1 sản phẩm thì tiến hành cập nhật SoluongSP của bảng PRODUCT điều kiện số lượng đặt hàng của bảng CHITIETHOADON <= số lượng sản phẩm của bảng PRODUCT, nếu không thoả mãn điều kiện sẽ ngừng INSERT
  
 CREATE TRIGGER trg_soluongdamua ON CHITIETHOADON
@@ -98,6 +100,7 @@ ENDS CURRENT_TIMESTAMP + INTERVAL 50 SECOND
 DO
 UPDATE product SET SoluongSP = SoluongSP + 1;
     
+-- Bài của Lê Minh Đức    
 -- Trigger : Khi khách hàng hủy đơn hàng thì số lượng sản phẩm được cập nhập
 ALTER TRiGGER trg_huydathang2 on dbo.DONHANG for UPDATE
 AS BEGIN
@@ -122,6 +125,7 @@ INSERT INTO CHITIETHOADON VALUES ('CT006',3,20000,0,'DH006','SP001')
 
 INSERT INTO CHITIETHOADON VALUES ('CT007',2,100000,0,'DH006','SP002')
 
+-- Bài của Phùng Tấn Đình
 -- Trigger : Khi thêm một sản phẩm thì số lượng không quá 50
 CREATE TRIGGER LIMIT_QUANTITY ON PRODUCT FOR INSERT
 AS
@@ -138,6 +142,7 @@ INSERT INTO PRODUCT VALUES ('SP005',N'Điện thoại',N'Điện thoại thông 
 
 DELETE FROM PRODUCT WHERE MaSP = 'SP005'
 
+-- Bài của Bích Cảm
 --- Trigger: Tạo trigger khi tiến hành cập nhật  SoluongSP của bảng PRODUCT thì số lượng sản phẩm >= số lượng đặt hàng của bảng
 CREATE TRIGGER Tr_update
     ON dbo.PRODUCT
@@ -185,6 +190,7 @@ ENDS CURRENT_TIMESTAMP + INTERVAL 1 MONTH
       
     select * from product;
 
+-- Bài của Võ Đức Dũng
 -- Trigger : Khi thêm một chi tiết đơn hàng thì số lượng lớn hơn 0 và mã đơn hàng có trong đơn hàng
 CREATE TRIGGER THEM1
 ON CHITIETHOADON
@@ -203,3 +209,33 @@ GO
 INSERT INTO CHITIETHOADON VALUES ('CT008',3,60000,0,'DH006','SP001')
 INSERT INTO CHITIETHOADON VALUES ('CT009',2,500000,0,'DH006','SP002')
 
+-- Bài của Lê Phước Đạt
+CREATE TRIGGER utg_check_khachhang
+ON KHACHHANG
+FOR INSERT
+AS
+BEGIN
+  DECLARE @email NVARCHAR(100), @phone NVARCHAR(100)
+  SELECT @email = i.email FROM inserted AS i;
+  SELECT @phone = i.phone FROM inserted AS i;
+  
+  IF (@email NOT LIKE '%@%')
+  BEGIN
+    PRINT 'Email khong hop le'
+    ROLLBACK TRAN
+    RETURN
+  END;
+  
+  IF (LEN(@phone) <> 10)
+  BEGIN
+    PRINT 'So dien thoai khong hop le'
+    ROLLBACK TRAN
+    RETURN
+  END;
+END;
+
+
+INSERT INTO KHACHHANG VALUES
+('KH006', 'Le Phuoc Dat', 'ledat.fakegmail.com', '0869570027', 'Hue');
+
+SELECT C.* FROM KHACHHANG AS C;
